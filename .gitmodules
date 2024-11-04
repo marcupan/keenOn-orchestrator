@@ -1,0 +1,9 @@
+[submodule "services/card-generate"]
+	path = services/card-generate
+	url = https://github.com/marcupan/keenOn-card-generate.git
+[submodule "services/card-compose"]
+	path = services/card-compose
+	url = https://github.com/marcupan/keenOn-card-compose.git
+[submodule "services/card-translate"]
+	path = services/card-translate
+	url = https://github.com/marcupan/keenOn-card-translate.git

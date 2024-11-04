@@ -1,0 +1,22 @@
+version: '3.8'
+services:
+  nginx:
+    image: nginx:latest
+    env_file:
+      - .env.${ENVIRONMENT}
+    volumes:
+      - ./nginx/nginx.${ENVIRONMENT}.conf:/etc/nginx/nginx.conf
+    ports:
+      - "80:80"
+    depends_on:
+      - node_service
+      - python_service
+      - rust_service
+
+  node_service:
+    build:
+      context: ./services/main-node-api
+    env_file:
+      - .env.${ENVIRONMENT}
+    ports:
+      - "3000:3000"
