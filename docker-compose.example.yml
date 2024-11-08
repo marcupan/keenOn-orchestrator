@@ -48,7 +48,7 @@ services:
             target: production
         container_name: compose-service
         ports:
-            - "4000:4000"
+            - "50052:50052"
         networks:
             - my-network
         restart: unless-stopped
