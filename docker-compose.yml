@@ -1,0 +1,81 @@
+services:
+    node-app:
+        build:
+            context: ./services/keenOn-card-generate
+        container_name: node-app
+        ports:
+            - "3000:3000"
+        environment:
+            NODE_ENV: production
+        depends_on:
+            postgres:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
+        networks:
+            - my-network
+        restart: unless-stopped
+
+    translate-service:
+        build:
+            context: ./services/keenOn-card-translate
+        container_name: translate-service
+        ports:
+            - "50051:50051"
+        networks:
+            - my-network
+        restart: unless-stopped
+
+    compose-service:
+        build:
+            context: ./services/keenOn-card-compose
+        container_name: compose-service
+        ports:
+            - "50052:50052"
+        networks:
+            - my-network
+        restart: unless-stopped
+
+    postgres:
+        image: postgres:14-alpine
+        container_name: postgres
+        ports:
+            - '6500:5432'
+        volumes:
+            - progresDB:/var/lib/postgresql/data
+        env_file:
+            - .env
+        networks:
+            - my-network
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+        restart: unless-stopped
+
+    redis:
+        image: redis:alpine
+        container_name: redis
+        ports:
+            - '6379:6379'
+        volumes:
+            - redisDB:/data
+        env_file:
+            - .env
+        networks:
+            - my-network
+        healthcheck:
+            test: ["CMD", "redis-cli", "ping"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+        restart: unless-stopped
+
+networks:
+    my-network:
+        driver: bridge
+
+volumes:
+    progresDB:
+    redisDB:
