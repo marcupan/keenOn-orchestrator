@@ -4,7 +4,7 @@ services:
             context: ./services/keenOn-card-generate
         container_name: node-app
         ports:
-            - "3000:3000"
+            - "4001:4001"
         depends_on:
             postgres:
                 condition: service_healthy
