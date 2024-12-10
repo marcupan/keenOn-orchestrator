@@ -5,7 +5,7 @@ services:
       target: development
     container_name: node-app-dev
     ports:
-      - "8080:8080"
+      - "8080:8080"  # Used for development, not conflicting with production
     volumes:
       - ./services/keenOn-card-generate:/app
       - /app/node_modules
