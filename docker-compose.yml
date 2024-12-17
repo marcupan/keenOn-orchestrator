@@ -38,9 +38,9 @@ services:
         image: postgres:14-alpine
         container_name: postgres
         ports:
-            - '6500:5432'
+            - "5432:5432"  # Adjusted port to avoid conflicts with development
         volumes:
-            - progresDB:/var/lib/postgresql/data
+            - postgres_data:/var/lib/postgresql/data
         env_file:
             - .env
         networks:
@@ -56,9 +56,9 @@ services:
         image: redis:alpine
         container_name: redis
         ports:
-            - '6379:6379'
+            - "6379:6379"
         volumes:
-            - redisDB:/data
+            - redis_data:/data
         env_file:
             - .env
         networks:
@@ -74,7 +74,7 @@ services:
         image: nginx:latest
         container_name: nginx
         ports:
-            - "8081:80"  # Adjusted to avoid conflict with development
+            - "80:80"  # Production default for HTTP
         volumes:
             - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
         depends_on:
@@ -83,11 +83,12 @@ services:
             - compose-service
         networks:
             - my-network
+        restart: unless-stopped
 
 networks:
     my-network:
         driver: bridge
 
 volumes:
-    progresDB:
-    redisDB:
+    postgres_data:
+    redis_data:
