@@ -1,16 +1,16 @@
 services:
-  node-app:
+  generate-app:
     build:
       context: ./services/keenOn-card-generate
       target: development
-    container_name: node-app-dev
+    container_name: generate-card-app-dev
     ports:
-      - "8080:8080"  # Development-specific port
+      - "4000:4000"  # Development-specific port
     volumes:
       - ./services/keenOn-card-generate:/app:cached
       - /app/node_modules
     env_file:
-      - .env.development
+      - ./services/keenOn-card-generate/.env.development
     depends_on:
       postgres:
         condition: service_healthy
@@ -29,11 +29,13 @@ services:
     build:
       context: ./services/keenOn-card-translate
       target: development
-    container_name: translate-service-dev
+    container_name: translate-card-service-dev
     ports:
       - "50051:50051"
     volumes:
       - ./services/keenOn-card-translate:/app
+    env_file:
+      - ./services/keenOn-card-translate/.env.development
     networks:
       - my-network
     restart: unless-stopped
@@ -42,11 +44,13 @@ services:
     build:
       context: ./services/keenOn-card-compose
       target: development
-    container_name: compose-service-dev
+    container_name: compose-card-service-dev
     ports:
       - "50052:50052"
     volumes:
       - ./services/keenOn-card-compose:/app
+    env_file:
+      - ./services/keenOn-card-compose/.env.development
     networks:
       - my-network
     restart: unless-stopped
@@ -59,7 +63,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     env_file:
-      - .env.development
+      - ./services/keenOn-card-generate/.env.development
     networks:
       - my-network
     healthcheck:
@@ -77,7 +81,7 @@ services:
     volumes:
       - redis_data:/data
     env_file:
-      - .env.development
+      - ./services/keenOn-card-generate/.env.development
     networks:
       - my-network
     healthcheck:
@@ -91,11 +95,11 @@ services:
     image: nginx:latest
     container_name: nginx-dev
     ports:
-      - "8081:80"  # Avoid conflict with production
+      - "8080:80"  # Avoid conflict with production
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
-      - node-app
+      - generate-app
       - translate-service
       - compose-service
     networks:

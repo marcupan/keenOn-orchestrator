@@ -1,8 +1,8 @@
 services:
-    node-app:
+    generate-app:
         build:
             context: ./services/keenOn-card-generate
-        container_name: node-app
+        container_name: generate-card-app
         ports:
             - "4001:4001"
         depends_on:
@@ -17,7 +17,7 @@ services:
     translate-service:
         build:
             context: ./services/keenOn-card-translate
-        container_name: translate-service
+        container_name: translate-card-service
         ports:
             - "50051:50051"
         networks:
@@ -27,7 +27,7 @@ services:
     compose-service:
         build:
             context: ./services/keenOn-card-compose
-        container_name: compose-service
+        container_name: compose-card-service
         ports:
             - "50052:50052"
         networks:
@@ -42,7 +42,7 @@ services:
         volumes:
             - postgres_data:/var/lib/postgresql/data
         env_file:
-            - .env
+            - ./services/keenOn-card-generate/.env
         networks:
             - my-network
         healthcheck:
@@ -60,7 +60,7 @@ services:
         volumes:
             - redis_data:/data
         env_file:
-            - .env
+            - ./services/keenOn-card-generate/.env
         networks:
             - my-network
         healthcheck:
@@ -78,7 +78,7 @@ services:
         volumes:
             - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
         depends_on:
-            - node-app
+            - generate-app
             - translate-service
             - compose-service
         networks:
