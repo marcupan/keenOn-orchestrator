@@ -17,7 +17,7 @@ services:
       redis:
         condition: service_healthy
     networks:
-      - my-network
+      - keenOn-network
     healthcheck:
       test: ["CMD", "grpcurl", "-plaintext", "localhost:50051", "list"]
       interval: 10s
@@ -37,7 +37,7 @@ services:
     env_file:
       - ./services/keenOn-card-translate/.env.development
     networks:
-      - my-network
+      - keenOn-network
     restart: unless-stopped
 
   compose-service:
@@ -52,7 +52,7 @@ services:
     env_file:
       - ./services/keenOn-card-compose/.env.development
     networks:
-      - my-network
+      - keenOn-network
     restart: unless-stopped
 
   postgres:
@@ -65,7 +65,7 @@ services:
     env_file:
       - ./services/keenOn-card-generate/.env.development
     networks:
-      - my-network
+      - keenOn-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 10s
@@ -83,7 +83,7 @@ services:
     env_file:
       - ./services/keenOn-card-generate/.env.development
     networks:
-      - my-network
+      - keenOn-network
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -103,11 +103,11 @@ services:
       - translate-service
       - compose-service
     networks:
-      - my-network
+      - keenOn-network
     restart: unless-stopped
 
 networks:
-  my-network:
+  keenOn-network:
     driver: bridge
 
 volumes:
