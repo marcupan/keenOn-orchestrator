@@ -7,3 +7,6 @@
 [submodule "services/card-translate"]
 	path = services/card-translate
 	url = https://github.com/marcupan/keenOn-card-translate.git
+[submodule "frontend/keen-on-app"]
+	path = frontend/keen-on-app
+	url = https://github.com/marcupan/keen-on-app.git
