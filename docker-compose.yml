@@ -38,7 +38,7 @@ services:
         image: postgres:14-alpine
         container_name: postgres
         ports:
-            - "5432:5432"  # Adjusted port to avoid conflicts with development
+            - "5432:5432"
         volumes:
             - postgres_data:/var/lib/postgresql/data
         env_file:
@@ -74,7 +74,7 @@ services:
         image: nginx:latest
         container_name: nginx
         ports:
-            - "80:80"  # Production default for HTTP
+            - "80:80"
         volumes:
             - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
         depends_on:
