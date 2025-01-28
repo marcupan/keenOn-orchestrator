@@ -19,7 +19,7 @@ services:
     networks:
       - keenOn-network
     healthcheck:
-      test: ["CMD", "grpcurl", "-plaintext", "localhost:50051", "list"]
+      test: ["CMD-SHELL", "curl -f http://localhost:4000/health || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
