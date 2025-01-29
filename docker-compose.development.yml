@@ -24,6 +24,7 @@ services:
       timeout: 5s
       retries: 5
     restart: unless-stopped
+    command: [ "sh", "-c", "pnpm db:push && pnpm start:dev" ]
 
   translate-service:
     build:
