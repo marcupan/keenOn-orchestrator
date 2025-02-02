@@ -1,3 +1,5 @@
+version: '3.9'
+
 services:
   generate-app:
     build:
@@ -6,9 +8,38 @@ services:
     container_name: generate-card-app
     env_file:
       - ./services/keenOn-card-generate/.env.production
+    # Explicitly pass key environment variables in case the .env file isn’t picked up:
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
+      - POSTGRES_PASSWORD=your_password_here
     networks:
       - keenOn-network
     restart: unless-stopped
+    stop_signal: SIGINT
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: [ "sh", "-c", "./wait-for-db.sh && pnpm db:push && node dist/src/app.js" ]
+
+  postgres:
+    image: postgres:14-alpine
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data:delegated
+    env_file:
+      - ./services/keenOn-card-generate/.env.production
+    networks:
+      - keenOn-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    stop_signal: SIGINT
 
   translate-service:
     build:
@@ -20,6 +51,7 @@ services:
     networks:
       - keenOn-network
     restart: unless-stopped
+    stop_signal: SIGINT
 
   compose-service:
     build:
@@ -31,38 +63,7 @@ services:
     networks:
       - keenOn-network
     restart: unless-stopped
-
-  postgres:
-    image: postgres:14-alpine
-    container_name: postgres
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    env_file:
-      - ./services/keenOn-card-generate/.env.production
-    networks:
-      - keenOn-network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
-
-  redis:
-    image: redis:alpine
-    container_name: redis
-    volumes:
-      - redis_data:/data
-    env_file:
-      - ./services/keenOn-card-generate/.env.production
-    networks:
-      - keenOn-network
-    healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
+    stop_signal: SIGINT
 
   nginx:
     image: nginx:latest
@@ -72,6 +73,8 @@ services:
       - "443:443"
     volumes:
       - ./nginx/nginx.production.conf:/etc/nginx/nginx.conf:ro
+      # Optionally, mount SSL certificates:
+      # - ./nginx/certs:/etc/nginx/certs:ro
     depends_on:
       - generate-app
       - translate-service
@@ -79,11 +82,11 @@ services:
     networks:
       - keenOn-network
     restart: unless-stopped
+    stop_signal: SIGINT
 
 networks:
   keenOn-network:
     driver: bridge
 
 volumes:
-  postgres_data:
-  redis_data:
+  postgres_data_prod:
