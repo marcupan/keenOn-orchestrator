@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   generate-app:
     build:
@@ -8,11 +6,6 @@ services:
     container_name: generate-card-app
     env_file:
       - ./services/keenOn-card-generate/.env.production
-    # Explicitly pass key environment variables in case the .env file isn’t picked up:
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_DB=postgres
-      - POSTGRES_PASSWORD=your_password_here
     networks:
       - keenOn-network
     restart: unless-stopped
