@@ -3,7 +3,7 @@ services:
     build:
       context: ./services/keenOn-card-generate
       target: development
-    container_name: generate-card-app-dev
+    container_name: generate-app        # changed from generate-card-app-dev
     ports:
       - "4000:4000"
     volumes:
@@ -26,6 +26,36 @@ services:
     restart: unless-stopped
     stop_signal: SIGINT
     command: [ "sh", "-c", "./wait-for-db.sh && pnpm db:push && pnpm start:dev" ]
+
+  translate-service:
+    build:
+      context: ./services/keenOn-card-translate
+      target: development
+    container_name: translate-service   # updated container name
+    ports:
+      - "50051:50051"
+    volumes:
+      - ./services/keenOn-card-translate:/app
+    env_file:
+      - ./services/keenOn-card-translate/.env.development
+    networks:
+      - keenOn-network
+    restart: unless-stopped
+
+  compose-service:
+    build:
+      context: ./services/keenOn-card-compose
+      target: development
+    container_name: compose-service      # updated container name
+    ports:
+      - "50052:50052"
+    volumes:
+      - ./services/keenOn-card-compose:/app
+    env_file:
+      - ./services/keenOn-card-compose/.env.development
+    networks:
+      - keenOn-network
+    restart: unless-stopped
 
   postgres:
     image: postgres:14-alpine
