@@ -13,7 +13,56 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    command: [ "sh", "-c", "./wait-for-db.sh && pnpm db:push && node dist/src/app.js" ]
+    # Use the production migration script (db:migrate:prod) instead of db:push:
+    command: [ "sh", "-c", "./wait-for-db.sh && pnpm db:migrate:prod && node dist/src/app.js" ]
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:4000/api/health || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: "512M"
+
+  translate-service:
+    build:
+      context: ./services/keenOn-card-translate
+      target: production
+    container_name: translate-card-service
+    env_file:
+      - ./services/keenOn-card-translate/.env.production
+    networks:
+      - keenOn-network
+    restart: unless-stopped
+    stop_signal: SIGINT
+    expose:
+      - "50051"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: "256M"
+
+  compose-service:
+    build:
+      context: ./services/keenOn-card-compose
+      target: production
+    container_name: compose-card-service
+    env_file:
+      - ./services/keenOn-card-compose/.env.production
+    networks:
+      - keenOn-network
+    restart: unless-stopped
+    stop_signal: SIGINT
+    expose:
+      - "50052"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: "256M"
 
   postgres:
     image: postgres:14-alpine
@@ -34,27 +83,22 @@ services:
     restart: unless-stopped
     stop_signal: SIGINT
 
-  translate-service:
-    build:
-      context: ./services/keenOn-card-translate
-      target: production
-    container_name: translate-card-service
+  redis:
+    image: redis:alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data:delegated
     env_file:
-      - ./services/keenOn-card-translate/.env.production
+      - ./services/keenOn-card-generate/.env.production
     networks:
       - keenOn-network
-    restart: unless-stopped
-    stop_signal: SIGINT
-
-  compose-service:
-    build:
-      context: ./services/keenOn-card-compose
-      target: production
-    container_name: compose-card-service
-    env_file:
-      - ./services/keenOn-card-compose/.env.production
-    networks:
-      - keenOn-network
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     restart: unless-stopped
     stop_signal: SIGINT
 
@@ -66,7 +110,7 @@ services:
       - "443:443"
     volumes:
       - ./nginx/nginx.production.conf:/etc/nginx/nginx.conf:ro
-      # Optionally, mount SSL certificates:
+      # Optionally mount SSL certificates:
       # - ./nginx/certs:/etc/nginx/certs:ro
     depends_on:
       - generate-app
@@ -83,3 +127,4 @@ networks:
 
 volumes:
   postgres_data_prod:
+  redis_data:
