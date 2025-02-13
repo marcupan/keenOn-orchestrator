@@ -95,6 +95,23 @@ services:
     restart: unless-stopped
     stop_signal: SIGINT
 
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.development.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - generate-app
+      - translate-service
+      - compose-service
+    networks:
+      - keenOn-network
+    restart: unless-stopped
+    stop_signal: SIGINT
+
 networks:
   keenOn-network:
     driver: bridge
