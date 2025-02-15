@@ -13,7 +13,6 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    # Use the production migration script (db:migrate:prod) instead of db:push:
     command: [ "sh", "-c", "./wait-for-db.sh && pnpm db:migrate:prod && node dist/src/app.js" ]
     healthcheck:
       test: [ "CMD-SHELL", "curl -f http://localhost:4000/api/health || exit 1" ]
