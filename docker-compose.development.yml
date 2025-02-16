@@ -3,7 +3,7 @@ services:
     build:
       context: ./services/keenOn-card-generate
       target: development
-    container_name: generate-app        # changed from generate-card-app-dev
+    container_name: generate-app
     ports:
       - "4000:4000"
     volumes:
@@ -31,7 +31,7 @@ services:
     build:
       context: ./services/keenOn-card-translate
       target: development
-    container_name: translate-service   # updated container name
+    container_name: translate-service
     ports:
       - "50051:50051"
     volumes:
@@ -46,7 +46,7 @@ services:
     build:
       context: ./services/keenOn-card-compose
       target: development
-    container_name: compose-service      # updated container name
+    container_name: compose-service
     ports:
       - "50052:50052"
     volumes:
