@@ -109,7 +109,6 @@ services:
       - "443:443"
     volumes:
       - ./nginx/nginx.production.conf:/etc/nginx/nginx.conf:ro
-      # Optionally mount SSL certificates:
       # - ./nginx/certs:/etc/nginx/certs:ro
     depends_on:
       - generate-app
