@@ -1,7 +1,11 @@
 .idea
 .idea/*
+
 .github
+
 .env
 .env.*
+
 *.backup.*
+
 nginx/certs/

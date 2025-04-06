@@ -46,6 +46,12 @@ services:
     build:
       context: ./services/keenOn-card-compose
       target: development
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+        reservations:
+          memory: 2G
     container_name: compose-service
     ports:
       - "50052:50052"
