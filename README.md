@@ -4,7 +4,7 @@ The **KeenOn Card Orchestration** repository manages the overall infrastructure 
 
 ## Overview
 
-This repository serves as the **orchestration layer** for deploying the entire project. It includes:
+This repository is the **orchestration layer** for deploying the entire project. It includes:
 - **Docker Compose** configuration for multi-service deployment.
 - **Nginx** configuration to handle reverse proxy and routing.
 - **Submodules** for the individual services:
@@ -16,4 +16,5 @@ All services communicate via **gRPC**, with **Nginx** providing load balancing a
 
 ---
 
-> **Note:** This project is not production-ready but is intended as a demonstration of my learning progress in backend development.
+
+> **Note:** This project is not production-ready but is intended to demonstrate my learning progress in backend development.
