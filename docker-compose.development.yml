@@ -9,6 +9,8 @@ services:
     volumes:
       - ./services/keenOn-card-generate:/app:cached
       - /app/node_modules
+    environment:
+      - NODE_ENV=development
     env_file:
       - ./services/keenOn-card-generate/.env.development
     depends_on:
@@ -83,23 +85,36 @@ services:
     stop_signal: SIGINT
 
   redis:
-    image: redis:alpine
+    image: redis:8.0-alpine
     container_name: redis-dev
     ports:
       - "6379:6379"
-    volumes:
-      - redis_data:/data:delegated
     env_file:
       - ./services/keenOn-card-generate/.env.development
-    networks:
-      - keenOn-network
+    volumes:
+      - redis_data:/data
+      - ./services/keenOn-card-generate/redis.conf.tpl:/etc/redis/redis.conf.tpl:ro
+    command: >
+      sh -c "
+        set -e;
+
+        # 1) Install envsubst
+        apk add --no-cache gettext;
+
+        # 2) Substitute $REDIS_PASSWORD into the template
+        envsubst < /etc/redis/redis.conf.tpl > /etc/redis/redis.conf;
+
+        # 3) Launch Redis
+        exec redis-server /etc/redis/redis.conf
+      "
     healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
+      test: [ "CMD-SHELL", "redis-cli -a \"$$REDIS_PASSWORD\" ping | grep -q PONG" ]
       interval: 10s
       timeout: 5s
       retries: 5
     restart: unless-stopped
-    stop_signal: SIGINT
+    networks:
+      - keenOn-network
 
   nginx:
     image: nginx:latest
@@ -124,5 +139,6 @@ networks:
     driver: bridge
 
 volumes:
+  generate-app-bcrypt:
   postgres_data:
   redis_data:
