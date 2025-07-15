@@ -1,11 +1,34 @@
-.idea
+# DO NOT PUSH - IDE specific files
+# These files contain user-specific settings and should not be shared
+.idea/
 .idea/*
+.vscode/
+*.sublime-*
 
-.github
+# DO NOT PUSH - GitHub workflow files (if needed locally)
+.github/
 
+# DO NOT PUSH - Environment variables
+# These files contain sensitive information like API keys and passwords
 .env
 .env.*
+!.env.example
 
+# DO NOT PUSH - Backup files
+# Temporary backup files created during development
 *.backup.*
+*~
+*.bak
+*.swp
 
+# DO NOT PUSH - Certificates and sensitive data
 nginx/certs/
+**/secrets/
+
+# DO NOT PUSH - OS specific files
+.DS_Store
+Thumbs.db
+
+# DO NOT PUSH - Log files
+logs/
+*.log
