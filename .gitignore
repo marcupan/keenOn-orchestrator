@@ -32,3 +32,6 @@ Thumbs.db
 # DO NOT PUSH - Log files
 logs/
 *.log
+
+# Learning materials
+backend-learning/

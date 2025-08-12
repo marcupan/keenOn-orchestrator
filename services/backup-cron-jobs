@@ -1,0 +1,17 @@
+# Cron jobs for automated backups of keenOn services
+# To install: crontab -l | cat - backup-cron-jobs | crontab -
+
+# Run keenOn-card-translate backup daily at 2:00 AM
+0 2 * * * /path/to/orchestrator-repo/services/keenOn-card-translate/scripts/backup-data.sh >> /data/backups/keenon-card-translate-backup.log 2>&1
+
+# Run keenOn-card-compose backup daily at 3:00 AM
+0 3 * * * /path/to/orchestrator-repo/services/keenOn-card-compose/scripts/backup-data.sh >> /data/backups/keenon-card-compose-backup.log 2>&1
+
+# Run keenOn-card-generate backup daily at 4:00 AM (if script exists)
+0 4 * * * /path/to/orchestrator-repo/services/keenOn-card-generate/scripts/backup-data.sh >> /data/backups/keenon-card-generate-backup.log 2>&1
+
+# Optional: Upload backups to S3 daily at 5:00 AM
+# 0 5 * * * AWS_S3_BUCKET=your-backup-bucket /path/to/orchestrator-repo/services/scripts/upload-backups-to-s3.sh >> /data/backups/s3-upload.log 2>&1
+
+# Clean up old logs weekly on Sunday at 1:00 AM
+0 1 * * 0 find /data/backups -name "*.log" -type f -mtime +30 -delete

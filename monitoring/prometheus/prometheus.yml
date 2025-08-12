@@ -1,0 +1,83 @@
+# Global configuration
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  scrape_timeout: 10s
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # - alertmanager:9093
+
+# Rule files to load
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+# Scrape configurations
+scrape_configs:
+  # Scrape Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Scrape Node Exporter for host metrics
+  - job_name: 'node'
+    static_configs:
+      - targets: ['node-exporter:9100']
+
+  # Scrape keenOn-card-generate service
+  - job_name: 'keenon-card-generate'
+    metrics_path: '/api/metrics'
+    static_configs:
+      - targets: ['keenon-card-generate:4000']
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        regex: '(.*):.*'
+        replacement: $1
+
+  # Scrape keenOn-card-translate service
+  - job_name: 'keenon-card-translate'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['keenon-card-translate:50051']
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        regex: '(.*):.*'
+        replacement: $1
+
+  # Scrape keenOn-card-compose service
+  - job_name: 'keenon-card-compose'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['keenon-card-compose:50052']
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        regex: '(.*):.*'
+        replacement: $1
+
+  # Scrape Nginx metrics
+  - job_name: 'nginx'
+    static_configs:
+      - targets: ['nginx-exporter:9113']
+
+  # Scrape PostgreSQL metrics
+  - job_name: 'postgresql'
+    static_configs:
+      - targets: ['postgres-exporter:9187']
+
+  # Scrape Redis metrics
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis-exporter:9121']
+
+  # Frontend application metrics
+  - job_name: 'frontend'
+    metrics_path: '/api/_metrics'
+    static_configs:
+      - targets: ['keen-on-app:3000']
